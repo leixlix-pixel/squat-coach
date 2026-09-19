@@ -50,7 +50,18 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
 .title .dot{color:var(--go)}
 .sub{color:var(--muted); font-size:14px; margin-top:6px; line-height:1.5}
 
-.levels{display:flex; flex-direction:column; gap:10px; margin-top:22px}
+.courses{display:flex; gap:9px; margin-top:16px}
+.cs{
+  flex:1; min-height:52px; border-radius:14px; background:var(--card);
+  border:2px solid var(--line); color:var(--muted);
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  font-size:16px; font-weight:700; letter-spacing:-.3px;
+}
+.cs .ce{font-size:19px; opacity:.5}
+.cs.on{border-color:var(--go); background:#16271d; color:var(--ink)}
+.cs.on .ce{opacity:1}
+
+.levels{display:flex; flex-direction:column; gap:10px; margin-top:12px}
 .lv{
   background:var(--card); border:2px solid var(--line); border-radius:16px;
   padding:14px 16px; display:flex; align-items:center; gap:14px; text-align:left; width:100%;
@@ -92,22 +103,27 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
 /* ---------- 안내 ---------- */
 .h2{font-size:21px; font-weight:900; margin-bottom:10px}
 .guide-scroll{flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; margin:0 -4px; padding:0 4px}
+.gh{font-size:17px; font-weight:900; color:#cfe9d8; margin:18px 0 9px; letter-spacing:-.3px}
+.gh:first-child{margin-top:0}
 .steps{display:flex; flex-direction:column; gap:9px}
 .step{display:flex; gap:11px; background:var(--card); border-radius:13px; padding:12px 13px; font-size:15px; line-height:1.5}
 .step i{
   flex:0 0 24px; height:24px; border-radius:8px; background:var(--go-d); color:#06240f;
   font-style:normal; font-weight:900; font-size:13px; display:flex; align-items:center; justify-content:center;
 }
-.badlist{margin-top:16px; background:#1b1620; border:1px solid #3a2a30; border-radius:13px; padding:13px}
+.badlist{margin-top:14px; background:#1b1620; border:1px solid #3a2a30; border-radius:13px; padding:13px}
 .badlist .bt{font-size:14px; font-weight:700; color:#f0a9a9; margin-bottom:8px}
 .badlist div.b{font-size:13.5px; color:#cbb9bd; line-height:1.6; padding-left:2px}
-.figbox{display:flex; justify-content:center; gap:18px; margin:4px 0 16px}
+.figbox{display:flex; justify-content:center; gap:18px; margin:4px 0 14px}
+.figbox.col{flex-direction:column; gap:10px}
 .figbox .f{background:var(--card); border-radius:16px; padding:8px 4px 4px; width:46%}
+.figbox.col .f{width:100%}
+.figbox .f svg{display:block; width:100%; height:auto}
 .figbox .f .cap{text-align:center; font-size:12px; color:var(--muted); padding-bottom:4px}
 
 /* ---------- 운동 ---------- */
-.wtop{display:flex; align-items:center; justify-content:space-between; font-size:14px; color:var(--muted)}
-.wtop .set{font-weight:700; color:var(--ink); font-size:15px}
+.wtop{display:flex; align-items:center; justify-content:space-between; font-size:14px; color:var(--muted); gap:8px}
+.wtop .set{font-weight:700; color:var(--ink); font-size:15px; white-space:nowrap}
 .wtop .clock{font-variant-numeric:tabular-nums; font-size:15px; font-weight:700; color:var(--ink)}
 
 .stage{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:0; position:relative; overflow:hidden}
@@ -115,14 +131,16 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
 #fig{height:100%; width:auto; max-width:100%; display:block}
 
 .cue{font-size:27px; font-weight:900; letter-spacing:-.5px; margin-top:2px; min-height:38px; text-align:center}
-.cue.down{color:var(--down)} .cue.up{color:var(--go)} .cue.hold{color:#c4b5fd}
+.cue.down{color:var(--down)} .cue.up{color:var(--go)} .cue.hold{color:#c4b5fd} .cue.stay{color:#c4b5fd}
 
 .big{font-size:clamp(54px,15vw,84px); font-weight:900; line-height:1; font-variant-numeric:tabular-nums}
 .big small{font-size:24px; color:var(--muted); font-weight:700}
 .ready .big{color:var(--rest)}
+.staying .big{color:#c4b5fd}
 
 .bar{width:100%; max-width:320px; height:9px; background:var(--card2); border-radius:9px; overflow:hidden; margin-top:12px}
 .bar i{display:block; height:100%; background:var(--go); border-radius:9px; width:0; transition:width .12s linear}
+.staying .bar i{background:#c4b5fd}
 .tip{
   margin-top:14px; font-size:14.5px; color:var(--muted); text-align:center; line-height:1.5;
   background:var(--card); border-radius:12px; padding:11px 12px; width:100%;
@@ -163,14 +181,15 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
 <!-- ================= 홈 ================= -->
 <section class="screen" id="sc-home">
   <div class="title">스쿼트 코치<span class="dot">.</span></div>
-  <div class="sub">화면만 보고 따라 하면 됩니다.<br>횟수는 소리로 세어 주고, 시간도 재 줍니다.</div>
+  <div class="sub" id="homeSub"></div>
 
+  <div class="courses" id="courses"></div>
   <div class="levels" id="levels"></div>
 
   <div class="stats">
-    <div class="stat"><b id="stToday">0</b><span>오늘 횟수</span></div>
-    <div class="stat"><b id="stWeek">0</b><span>이번 주</span></div>
-    <div class="stat"><b id="stStreak">0</b><span>연속 일수</span></div>
+    <div class="stat"><b id="stV1">0</b><span id="stL1">오늘 횟수</span></div>
+    <div class="stat"><b id="stV2">0</b><span id="stL2">이번 주</span></div>
+    <div class="stat"><b id="stV3">0</b><span id="stL3">연속 일수</span></div>
   </div>
 
   <div class="toggles">
@@ -181,10 +200,7 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
 
   <div class="spacer"></div>
 
-  <div class="safety">
-    <b>무릎이나 허리가 아프면 바로 멈추세요.</b> 통증은 참는 게 아닙니다.
-    아픈 날은 의자에 살짝 닿았다 일어나는 <b>의자 스쿼트</b>로 바꿔도 효과가 있습니다.
-  </div>
+  <div class="safety" id="homeSafety"></div>
 
   <div class="row" style="margin-top:12px">
     <button class="btn primary" onclick="goGuide()">시작하기</button>
@@ -193,37 +209,8 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
 
 <!-- ================= 자세 안내 ================= -->
 <section class="screen" id="sc-guide" hidden>
-  <div class="h2">이렇게 하면 됩니다</div>
-
-  <div class="guide-scroll">
-    <div class="figbox">
-      <div class="f"><svg viewBox="0 0 120 200" id="figStand"></svg><div class="cap">시작 자세</div></div>
-      <div class="f"><svg viewBox="0 0 120 200" id="figSquat"></svg><div class="cap">앉은 자세</div></div>
-    </div>
-
-    <div class="steps">
-      <div class="step"><i>1</i><div>발은 <b>어깨너비</b>로 벌리고, 발끝은 살짝 바깥쪽을 봅니다.</div></div>
-      <div class="step"><i>2</i><div>가슴을 펴고 <b>시선은 정면</b>. 허리를 둥글게 말지 않습니다.</div></div>
-      <div class="step"><i>3</i><div>의자에 앉듯 <b>엉덩이를 뒤로 빼면서</b> 천천히 내려갑니다. (2초)</div></div>
-      <div class="step"><i>4</i><div>허벅지가 <b>바닥과 나란해지면</b> 멈춥니다. 더 깊이 갈 필요 없습니다.</div></div>
-      <div class="step"><i>5</i><div><b>발바닥 전체</b>로 바닥을 밀며 올라옵니다. 무릎은 발끝 방향 그대로.</div></div>
-      <div class="step"><i>6</i><div>내려갈 때 <b>숨을 들이마시고</b>, 올라올 때 <b>내쉽니다</b>.</div></div>
-    </div>
-
-    <div class="badlist">
-      <div class="bt">흔한 실수 — 이렇게 고치세요</div>
-      <div class="b">• 무릎이 발끝보다 많이 앞으로 나간다 → <b>엉덩이를 더 뒤로</b> 빼세요.<br>
-      • 뒤꿈치가 바닥에서 들린다 → <b>덜 깊게</b> 내려가도 괜찮습니다.<br>
-      • 허리가 둥글게 말린다 → 깊이를 줄이고 <b>가슴을 펴세요</b>.<br>
-      • 무릎이 안쪽으로 모인다 → 무릎을 <b>발끝 방향으로</b> 밀어내세요.</div>
-    </div>
-
-    <div class="safety" style="margin-top:14px">
-      소리가 안 나면 폰의 <b>무음 모드</b>를 풀고, 화면을 한 번 더 눌러 보세요.
-      운동 중에는 화면이 저절로 꺼지지 않습니다.
-    </div>
-  </div>
-
+  <div class="h2" id="guideTitle">이렇게 하면 됩니다</div>
+  <div class="guide-scroll" id="guideBody"></div>
   <div class="row" style="margin-top:14px">
     <button class="btn ghost" style="flex:0 0 34%" onclick="goHome()">뒤로</button>
     <button class="btn primary" style="flex:1" onclick="startWorkout()" id="btnStart">준비됐어요</button>
@@ -233,7 +220,7 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
 <!-- ================= 운동 중 ================= -->
 <section class="screen" id="sc-workout" hidden>
   <div class="wtop">
-    <span class="set"><span id="wSet">1</span>세트 <span style="color:var(--muted);font-weight:400">/ <span id="wSets">3</span></span></span>
+    <span class="set" id="wSetLab">1세트</span>
     <span id="wLevel" style="font-size:13px"></span>
     <span class="clock" id="wClock">00:00</span>
   </div>
@@ -256,7 +243,7 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
 <!-- ================= 휴식 ================= -->
 <section class="screen" id="sc-rest" hidden>
   <div class="wtop">
-    <span class="set"><span id="rSetDone">1</span>세트 완료</span>
+    <span class="set" id="rDoneLab">1세트 완료</span>
     <span class="clock" id="rClock">00:00</span>
   </div>
   <div class="restwrap">
@@ -280,9 +267,9 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
     <div class="msg" id="dMsg"></div>
   </div>
   <div class="result">
-    <div class="r"><b id="dReps">0</b><span>한 횟수</span></div>
-    <div class="r"><b id="dTime">0:00</b><span>걸린 시간</span></div>
-    <div class="r"><b id="dSets">0</b><span>세트</span></div>
+    <div class="r"><b id="dV1">0</b><span id="dL1">한 횟수</span></div>
+    <div class="r"><b id="dV2">0:00</b><span id="dL2">걸린 시간</span></div>
+    <div class="r"><b id="dV3">0</b><span id="dL3">세트</span></div>
   </div>
   <div class="logline" id="dLog"></div>
   <div class="spacer"></div>
@@ -298,59 +285,104 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
 </div>
 
 <script>
-/* ===================== 설정값 ===================== */
-const LV = {
-  easy:   {key:'easy',   emoji:'🌱', name:'입문',  reps:10, sets:2, rest:60, down:2200, hold:400, up:1800,
-           ds:'한 번도 안 해 봤다면 여기부터', },
-  normal: {key:'normal', emoji:'💪', name:'보통',  reps:15, sets:3, rest:45, down:2000, hold:300, up:1500,
-           ds:'조금 숨이 차는 정도'},
-  hard:   {key:'hard',   emoji:'🔥', name:'도전',  reps:20, sets:4, rest:40, down:1800, hold:300, up:1300,
-           ds:'끝나면 허벅지가 후들거립니다'}
+/* ===================== 동작 ===================== */
+/* kind:'rep'  = 내렸다 올리는 왕복. up 이 끝나는 순간에만 센다.
+   kind:'hold' = 그냥 버티는 것. 초를 센다.                        */
+const EX = {
+  squat: {
+    name:'스쿼트', kind:'rep',
+    cue(phase, rep){ return phase==='down' ? '천천히 앉기' : phase==='up' ? '밀고 올라오기' : '잠깐 멈춤'; },
+    tips:['무릎이 발끝보다 앞으로 나가지 않게','엉덩이를 뒤로 빼면서 앉기','시선은 정면, 가슴은 펴고',
+          '발뒤꿈치를 바닥에서 떼지 않기','무릎이 안쪽으로 모이지 않게','허리를 둥글게 말지 않기',
+          '내려갈 때 들이마시고, 올라올 때 내쉬기','무게는 발바닥 가운데에','어깨에 힘을 빼고, 목은 길게',
+          '급하게 튕기지 말고 같은 속도로']
+  },
+  plank: {
+    name:'플랭크', kind:'hold',
+    cue(){ return '버티기'; },
+    tips:['엉덩이가 위로 솟지 않게','허리가 아래로 처지지 않게','시선은 손 앞 바닥에',
+          '숨을 참지 말고 계속 쉬기','배에 힘을 주고 머리부터 발까지 한 줄로','힘들면 무릎을 바닥에 대세요']
+  },
+  deadbug: {
+    name:'데드버그', kind:'rep',
+    cue(phase, rep){
+      const side = (rep % 2 === 0) ? '오른팔·왼다리' : '왼팔·오른다리';
+      return phase==='down' ? side + ' 뻗기' : phase==='up' ? '천천히 돌아오기' : '잠깐 멈춤';
+    },
+    tips:['허리를 바닥에 붙인 채로','천천히, 같은 속도로','바닥에 닿기 직전까지만',
+          '어깨는 바닥에 붙이고','뻗을 때 숨을 내쉬기','허리가 뜨면 덜 뻗어도 됩니다']
+  }
 };
+
+/* ===================== 코스와 난이도 ===================== */
+const COURSE = {
+  squat: {
+    key:'squat', name:'스쿼트', emoji:'🦵',
+    sub:'화면만 보고 따라 하면 됩니다.<br>횟수는 소리로 세어 주고, 시간도 재 줍니다.',
+    safety:'<b>무릎이나 허리가 아프면 바로 멈추세요.</b> 통증은 참는 게 아닙니다. ' +
+           '아픈 날은 의자에 살짝 닿았다 일어나는 <b>의자 스쿼트</b>로 바꿔도 효과가 있습니다.',
+    resttips:['허벅지 앞쪽을 가볍게 털어 주세요.','숨을 깊게 들이마시고 길게 내쉬세요.','물 한 모금 드세요.',
+              '종아리를 쭉 늘려 주세요.','제자리에서 천천히 걸어 보세요.','무릎을 가볍게 흔들어 풀어 주세요.'],
+    praise:['오늘 몫은 다 했습니다. 내일의 다리가 고마워할 겁니다.',
+            '한 세트라도 한 사람과 안 한 사람은 다릅니다.',
+            '숫자보다 중요한 건 어제도 했고 오늘도 했다는 것.',
+            '허벅지가 뻐근하면 제대로 한 겁니다.',
+            '이만큼 앉았다 일어났습니다. 충분합니다.'],
+    levels: {
+      easy:   {emoji:'🌱', name:'입문', ds:'한 번도 안 해 봤다면 여기부터', rest:60,
+               moves:[{ex:'squat', reps:10, sets:2, down:2200, hold:400, up:1800}]},
+      normal: {emoji:'💪', name:'보통', ds:'조금 숨이 차는 정도', rest:45,
+               moves:[{ex:'squat', reps:15, sets:3, down:2000, hold:300, up:1500}]},
+      hard:   {emoji:'🔥', name:'도전', ds:'끝나면 허벅지가 후들거립니다', rest:40,
+               moves:[{ex:'squat', reps:20, sets:4, down:1800, hold:300, up:1300}]}
+    }
+  },
+  core: {
+    key:'core', name:'코어', emoji:'🧘',
+    sub:'플랭크와 데드버그를 이어서 합니다.<br>스쿼트로는 배가 잘 안 쓰여서 따로 있습니다.',
+    safety:'<b>허리가 아프면 바로 멈추세요.</b> 통증은 참는 게 아닙니다. ' +
+           '힘든 날은 플랭크를 <b>무릎 대고</b> 하고, 데드버그는 <b>덜 뻗어도</b> 됩니다.',
+    resttips:['배에 힘을 풀고 숨을 고르세요.','무릎을 가슴 쪽으로 당겨 허리를 풀어 주세요.','물 한 모금 드세요.',
+              '손목을 가볍게 돌려 주세요.','엎드려서 숨을 길게 내쉬세요.','어깨를 크게 한 바퀴 돌려 주세요.'],
+    praise:['코어는 티 안 나게 쌓입니다. 오늘도 쌓았습니다.',
+            '배가 뻐근하면 제대로 한 겁니다.',
+            '허리를 지키는 건 결국 배 힘입니다.',
+            '짧아도 매일이 이깁니다.',
+            '버틴 만큼 그대로 남습니다.'],
+    levels: {
+      easy:   {emoji:'🌱', name:'입문', ds:'허리에 부담 없이 배부터', rest:45,
+               moves:[{ex:'plank', secs:20, sets:2},
+                      {ex:'deadbug', reps:8, sets:2, down:2200, hold:400, up:2000}]},
+      normal: {emoji:'💪', name:'보통', ds:'끝나면 배가 뻐근한 정도', rest:40,
+               moves:[{ex:'plank', secs:30, sets:3},
+                      {ex:'deadbug', reps:12, sets:2, down:2000, hold:400, up:1800}]},
+      hard:   {emoji:'🔥', name:'도전', ds:'버티는 마지막 10초가 진짜입니다', rest:40,
+               moves:[{ex:'plank', secs:45, sets:3},
+                      {ex:'deadbug', reps:16, sets:3, down:2000, hold:400, up:1800}]}
+    }
+  }
+};
+
 const KNUM = ['하나','둘','셋','넷','다섯','여섯','일곱','여덟','아홉','열',
   '열하나','열둘','열셋','열넷','열다섯','열여섯','열일곱','열여덟','열아홉','스물',
   '스물하나','스물둘','스물셋','스물넷','스물다섯'];
 
-const TIPS = [
-  '무릎이 발끝보다 앞으로 나가지 않게',
-  '엉덩이를 뒤로 빼면서 앉기',
-  '시선은 정면, 가슴은 펴고',
-  '발뒤꿈치를 바닥에서 떼지 않기',
-  '무릎이 안쪽으로 모이지 않게',
-  '허리를 둥글게 말지 않기',
-  '내려갈 때 들이마시고, 올라올 때 내쉬기',
-  '무게는 발바닥 가운데에',
-  '어깨에 힘을 빼고, 목은 길게',
-  '급하게 튕기지 말고 같은 속도로'
-];
-const RESTTIPS = [
-  '허벅지 앞쪽을 가볍게 털어 주세요.',
-  '숨을 깊게 들이마시고 길게 내쉬세요.',
-  '물 한 모금 드세요.',
-  '종아리를 쭉 늘려 주세요.',
-  '제자리에서 천천히 걸어 보세요.',
-  '무릎을 가볍게 흔들어 풀어 주세요.'
-];
-const PRAISE = [
-  '오늘 몫은 다 했습니다. 내일의 다리가 고마워할 겁니다.',
-  '한 세트라도 한 사람과 안 한 사람은 다릅니다.',
-  '숫자보다 중요한 건 어제도 했고 오늘도 했다는 것.',
-  '허벅지가 뻐근하면 제대로 한 겁니다.',
-  '이만큼 앉았다 일어났습니다. 충분합니다.'
-];
-
 /* ===================== 상태 ===================== */
 const S = {
-  screen:'home', level:'normal',
-  set:1, rep:0, totalReps:0,
+  screen:'home', course:'squat', level:'normal',
+  plan:[], bi:0, rep:0, totalReps:0, plankSec:0,
   phase:'ready', phaseDur:0, phaseLeft:0,
   elapsed:0, paused:false, quitArmed:0,
   lastShown:-1, tipIdx:0, wakeLock:null
 };
-const cfg = {voice:true, beep:true, vib:true};
+const cfg = {voice:true, beep:true, vib:true, course:'squat'};
 
 const el = id => document.getElementById(id);
 const LS_CFG = 'squat-coach-cfg', LS_LOG = 'squat-coach-log';
+
+const CO = () => COURSE[S.course];
+const LEV = () => COURSE[S.course].levels[S.level];
+const BLK = () => S.plan[S.bi] || S.plan[S.plan.length-1];
 
 /* ===================== 저장 ===================== */
 function loadCfg(){
@@ -358,6 +390,7 @@ function loadCfg(){
     const raw = localStorage.getItem(LS_CFG);
     if(raw) Object.assign(cfg, JSON.parse(raw));
   }catch(e){}
+  if(COURSE[cfg.course]) S.course = cfg.course;
   renderToggles();
 }
 function saveCfg(){ try{ localStorage.setItem(LS_CFG, JSON.stringify(cfg)); }catch(e){} }
@@ -386,16 +419,28 @@ function streakDays(list){
   while(days.has(todayKey(d))){ n++; d.setDate(d.getDate()-1); }
   return n;
 }
+/* 옛 기록에는 course 가 없다 — 전부 스쿼트다 */
+const isCore = r => r.course === 'core';
+
 function renderStats(){
   const list = loadLog(), tk = todayKey(), mk = mondayKey();
-  let today = 0, week = 0;
-  for(const r of list){
-    if(r.date === tk) today += r.reps;
-    if(r.date >= mk) week += r.reps;
+  const put = (i, v, lab) => { el('stV'+i).textContent = v; el('stL'+i).textContent = lab; };
+  if(S.course === 'core'){
+    let sec = 0, reps = 0;
+    for(const r of list) if(isCore(r) && r.date === tk){ sec += (r.plankSec||0); reps += (r.reps||0); }
+    put(1, sec, '오늘 플랭크(초)');
+    put(2, reps, '오늘 데드버그');
+  }else{
+    let today = 0, week = 0;
+    for(const r of list){
+      if(isCore(r)) continue;
+      if(r.date === tk) today += r.reps;
+      if(r.date >= mk) week += r.reps;
+    }
+    put(1, today, '오늘 횟수');
+    put(2, week, '이번 주');
   }
-  el('stToday').textContent = today;
-  el('stWeek').textContent = week;
-  el('stStreak').textContent = streakDays(list);
+  put(3, streakDays(list), '연속 일수');      // 어느 코스든 한 날은 센다
 }
 
 /* ===================== 소리 ===================== */
@@ -447,39 +492,116 @@ function say(text, force){
 }
 function buzz(p){ if(cfg.vib && navigator.vibrate) try{ navigator.vibrate(p); }catch(e){} }
 
-/* ===================== 스틱 피겨 ===================== */
-const POSE_UP = {
-  head:[60,28], neck:[60,40], shoulder:[60,52], hip:[60,100],
-  knee:[60,140], ankle:[60,178], heel:[49,179], toe:[82,179], hand:[67,92]
-};
-const POSE_DOWN = {
-  head:[48,64], neck:[47,75], shoulder:[45,87], hip:[40,136],
-  knee:[80,146], ankle:[60,178], heel:[49,179], toe:[82,179], hand:[82,78]
-};
-function lerpPose(t){
-  const o = {};
-  for(const k in POSE_UP){
-    const a = POSE_UP[k], b = POSE_DOWN[k];
-    o[k] = [a[0] + (b[0]-a[0])*t, a[1] + (b[1]-a[1])*t];
+/* ===================== 스틱 피겨 =====================
+   동작마다 관절 좌표 두 벌(a=시작, b=끝)을 t 로 보간해서 그린다.
+   좌표를 손볼 때는 팔·다리 길이가 두 자세에서 거의 같아야 한다. */
+const FIG = {
+  squat: {
+    vb:'0 0 120 200', floor:'M8 184 H112', headR:11.5,
+    a:{head:[60,28],neck:[60,40],shoulder:[60,52],hip:[60,100],knee:[60,140],ankle:[60,178],heel:[49,179],toe:[82,179],hand:[67,92]},
+    b:{head:[48,64],neck:[47,75],shoulder:[45,87],hip:[40,136],knee:[80,146],ankle:[60,178],heel:[49,179],toe:[82,179],hand:[82,78]},
+    bones:[['shoulder','hand',6],['neck','hip',8],['hip','knee',8],['knee','ankle',8],['heel','toe',6]]
+  },
+  /* 엎드려 버티기 — 움직이지 않으므로 b 가 없다 */
+  plank: {
+    vb:'0 0 200 120', floor:'M8 104 H192', headR:11,
+    a:{head:[30,56],neck:[44,62],shoulder:[56,66],elbow:[56,100],hand:[26,100],
+       hip:[110,76],knee:[146,86],ankle:[176,96],toe:[186,101]},
+    bones:[['hand','elbow',6],['elbow','shoulder',7],['neck','hip',8],['hip','knee',8],['knee','ankle',8],['ankle','toe',6]]
+  },
+  /* 누워서 한쪽 팔과 반대쪽 다리 뻗기 */
+  deadbug: {
+    vb:'0 0 200 120', floor:'M8 104 H192', headR:11,
+    a:{head:[20,88],neck:[34,93],shoulder:[46,96],hip:[98,100],hand:[46,44],knee:[98,50],ankle:[142,50]},
+    b:{head:[20,88],neck:[34,93],shoulder:[46,96],hip:[98,100],hand:[4,66],knee:[147,91],ankle:[190,83]},
+    bones:[['shoulder','hand',7],['neck','hip',8],['hip','knee',8],['knee','ankle',8]]
   }
-  return o;
-}
-function figureSVG(t, color){
-  const p = lerpPose(t);
+};
+function figureSVG(key, t, color){
+  const F = FIG[key], A = F.a, B = F.b || F.a, p = {};
+  for(const j in A){
+    const a = A[j], b = B[j] || a;
+    p[j] = [a[0] + (b[0]-a[0])*t, a[1] + (b[1]-a[1])*t];
+  }
   const L = (a,b,w) => '<line x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+b[0].toFixed(1)+'" y2="'+b[1].toFixed(1)+'" stroke-width="'+w+'"/>';
-  return '<g stroke="#2c3749" stroke-width="3"><line x1="8" y1="184" x2="112" y2="184" stroke-linecap="round"/></g>' +
+  return '<path d="'+F.floor+'" stroke="#2c3749" stroke-width="3" stroke-linecap="round" fill="none"/>' +
     '<g stroke="'+color+'" stroke-linecap="round" fill="none">' +
-      L(p.shoulder, p.hand, 6) +
-      L(p.neck, p.hip, 8) +
-      L(p.hip, p.knee, 8) +
-      L(p.knee, p.ankle, 8) +
-      L(p.heel, p.toe, 6) +
+      F.bones.map(b => L(p[b[0]], p[b[1]], b[2])).join('') +
     '</g>' +
-    '<circle cx="'+p.head[0].toFixed(1)+'" cy="'+p.head[1].toFixed(1)+'" r="11.5" fill="'+color+'"/>';
+    '<circle cx="'+p.head[0].toFixed(1)+'" cy="'+p.head[1].toFixed(1)+'" r="'+F.headR+'" fill="'+color+'"/>';
 }
-function drawStaticFigures(){
-  el('figStand').innerHTML = figureSVG(0, '#4ade80');
-  el('figSquat').innerHTML = figureSVG(1, '#60a5fa');
+function figTag(key, t, color, cap){
+  return '<div class="f"><svg viewBox="'+FIG[key].vb+'">' + figureSVG(key, t, color) + '</svg>' +
+         '<div class="cap">'+cap+'</div></div>';
+}
+
+/* ===================== 자세 안내 ===================== */
+const GUIDE = {
+  squat: {
+    title:'이렇게 하면 됩니다',
+    parts:[{
+      ex:'squat', h:'', col:false,
+      figs:[[0,'시작 자세','#4ade80'],[1,'앉은 자세','#60a5fa']],
+      steps:['발은 <b>어깨너비</b>로 벌리고, 발끝은 살짝 바깥쪽을 봅니다.',
+             '가슴을 펴고 <b>시선은 정면</b>. 허리를 둥글게 말지 않습니다.',
+             '의자에 앉듯 <b>엉덩이를 뒤로 빼면서</b> 천천히 내려갑니다. (2초)',
+             '허벅지가 <b>바닥과 나란해지면</b> 멈춥니다. 더 깊이 갈 필요 없습니다.',
+             '<b>발바닥 전체</b>로 바닥을 밀며 올라옵니다. 무릎은 발끝 방향 그대로.',
+             '내려갈 때 <b>숨을 들이마시고</b>, 올라올 때 <b>내쉽니다</b>.'],
+      bad:['무릎이 발끝보다 많이 앞으로 나간다 → <b>엉덩이를 더 뒤로</b> 빼세요.',
+           '뒤꿈치가 바닥에서 들린다 → <b>덜 깊게</b> 내려가도 괜찮습니다.',
+           '허리가 둥글게 말린다 → 깊이를 줄이고 <b>가슴을 펴세요</b>.',
+           '무릎이 안쪽으로 모인다 → 무릎을 <b>발끝 방향으로</b> 밀어내세요.']
+    }]
+  },
+  core: {
+    title:'두 가지를 이어서 합니다',
+    parts:[{
+      ex:'plank', h:'① 플랭크 — 엎드려 버티기', col:true,
+      figs:[[0,'팔꿈치는 어깨 바로 아래, 머리부터 발까지 한 줄','#c4b5fd']],
+      steps:['바닥에 엎드려 <b>팔꿈치를 어깨 바로 아래</b>에 둡니다.',
+             '발은 어깨너비보다 좁게, <b>발끝으로</b> 바닥을 딛습니다.',
+             '머리 · 등 · 엉덩이 · 발뒤꿈치가 <b>한 줄</b>이 되게 합니다.',
+             '배에 힘을 주고 <b>엉덩이가 솟거나 처지지 않게</b> 버팁니다.',
+             '숨은 참지 말고 <b>천천히 계속</b> 쉽니다.'],
+      bad:['엉덩이가 위로 솟는다 → 배에 힘을 주고 <b>내려서 한 줄</b>로.',
+           '허리가 아래로 처진다 → 엉덩이를 살짝 조이세요. 힘들면 <b>무릎을 대고</b> 합니다.',
+           '목이 꺾여 아래를 본다 → <b>시선은 손 앞 바닥</b>에.',
+           '숨을 참는다 → 힘들수록 <b>길게 내쉬세요</b>.']
+    },{
+      ex:'deadbug', h:'② 데드버그 — 누워서 팔다리 뻗기', col:true,
+      figs:[[0,'시작 자세 — 무릎 90도, 팔은 천장으로','#4ade80'],
+            [1,'뻗은 자세 — 한쪽 팔과 반대쪽 다리','#60a5fa']],
+      steps:['등을 바닥에 대고 누워 <b>무릎을 90도로 들어</b> 올립니다.',
+             '두 팔은 <b>천장을 향해</b> 곧게 뻗습니다.',
+             '허리와 바닥 사이에 <b>틈이 생기지 않게</b> 배에 힘을 줍니다.',
+             '<b>한쪽 팔과 반대쪽 다리</b>를 천천히 바닥 쪽으로 뻗습니다. (2초)',
+             '바닥에 <b>닿기 직전</b>에 멈췄다가 천천히 제자리로 돌아옵니다.',
+             '반대쪽도 똑같이. <b>좌우를 번갈아</b> 셉니다.'],
+      bad:['허리가 바닥에서 뜬다 → <b>덜 뻗어도</b> 됩니다. 뜨지 않는 범위까지만.',
+           '팔다리를 휙 던진다 → 천천히, <b>같은 속도로</b>.',
+           '숨을 참는다 → <b>뻗을 때 내쉬세요</b>.',
+           '목과 어깨에 힘이 들어간다 → 턱을 살짝 당기고 <b>어깨는 바닥에</b>.']
+    }]
+  }
+};
+/* 그림을 id 로 뒤에서 찾지 않는다 — innerHTML 안에 이미 그려서 넣는다 */
+function renderGuide(){
+  const g = GUIDE[S.course];
+  el('guideTitle').textContent = g.title;
+  let h = '';
+  for(const p of g.parts){
+    if(p.h) h += '<div class="gh">' + p.h + '</div>';
+    h += '<div class="figbox' + (p.col ? ' col' : '') + '">' +
+         p.figs.map(f => figTag(p.ex, f[0], f[2], f[1])).join('') + '</div>';
+    h += '<div class="steps">' + p.steps.map((s,i) =>
+         '<div class="step"><i>'+(i+1)+'</i><div>'+s+'</div></div>').join('') + '</div>';
+    h += '<div class="badlist"><div class="bt">흔한 실수 — 이렇게 고치세요</div>' +
+         '<div class="b">' + p.bad.map(b => '• ' + b).join('<br>') + '</div></div>';
+  }
+  h += '<div class="safety" style="margin-top:14px">소리가 안 나면 폰의 <b>무음 모드</b>를 풀고, ' +
+       '화면을 한 번 더 눌러 보세요. 운동 중에는 화면이 저절로 꺼지지 않습니다.</div>';
+  el('guideBody').innerHTML = h;
 }
 
 /* ===================== 화면 전환 ===================== */
@@ -491,21 +613,55 @@ function show(name){
 }
 function goHome(){
   releaseLock(); stopAll();
-  renderStats(); renderLevels();
+  renderHome();
   show('home');
 }
-function goGuide(){ stopAll(); show('guide'); }
+function goGuide(){ stopAll(); renderGuide(); show('guide'); }
 
+function renderHome(){
+  el('homeSub').innerHTML = CO().sub;
+  el('homeSafety').innerHTML = CO().safety;
+  renderCourses(); renderLevels(); renderStats();
+}
+function renderCourses(){
+  el('courses').innerHTML = Object.keys(COURSE).map(k =>
+    '<button class="cs '+(S.course===k?'on':'')+'" onclick="pickCourse(\''+k+'\')">' +
+    '<span class="ce">'+COURSE[k].emoji+'</span>'+COURSE[k].name+'</button>').join('');
+}
+function pickCourse(k){
+  if(S.course === k) return;
+  S.course = k; cfg.course = k; saveCfg();
+  renderHome(); buzz(15);
+}
+
+/* 난이도 카드 한 장에 들어갈 요약 */
+function moveLabel(m){
+  return EX[m.ex].name + ' ' + (m.secs ? m.secs + '초' : m.reps + '회');
+}
+function levelSum(lv){ return lv.moves.map(m => moveLabel(m) + ' × ' + m.sets).join(' · '); }
+function levelBlocks(lv){ let n = 0; for(const m of lv.moves) n += m.sets; return n; }
+function levelSecs(lv){
+  let ms = 0;
+  for(const m of lv.moves){
+    const per = m.secs ? m.secs*1000 : m.reps*(m.down + m.hold + m.up);
+    ms += per * m.sets;
+  }
+  const n = levelBlocks(lv);
+  ms += 3100*n + lv.rest*1000*(n-1);
+  return Math.round(ms/1000);
+}
 function renderLevels(){
-  el('levels').innerHTML = Object.keys(LV).map(k => {
-    const v = LV[k];
-    const secs = Math.round((v.reps*(v.down+v.hold+v.up)*v.sets + v.rest*1000*(v.sets-1))/1000);
-    const mm = Math.round(secs/60);
+  const c = CO(), sq = (S.course === 'squat');
+  el('levels').innerHTML = Object.keys(c.levels).map(k => {
+    const v = c.levels[k];
+    const mm = Math.max(1, Math.round(levelSecs(v)/60));
+    const rp = sq ? (v.moves[0].reps + '회 × ' + v.moves[0].sets + '세트') : (levelBlocks(v) + '세트');
+    const tm = '약 ' + mm + '분 · ' + (sq ? ('세트 사이 ' + v.rest + '초 휴식') : levelSum(v));
     return '<button class="lv '+(S.level===k?'on':'')+'" onclick="pickLevel(\''+k+'\')">'+
       '<span class="mark">'+v.emoji+'</span><span class="txt">'+
-      '<span class="nm">'+v.name+'<span class="rp">'+v.reps+'회 × '+v.sets+'세트</span></span>'+
+      '<span class="nm">'+v.name+'<span class="rp">'+rp+'</span></span>'+
       '<span class="ds">'+v.ds+'</span>'+
-      '<span class="tm">약 '+mm+'분 · 세트 사이 '+v.rest+'초 휴식</span>'+
+      '<span class="tm">'+tm+'</span>'+
       '</span></button>';
   }).join('');
 }
@@ -538,83 +694,125 @@ async function keepAwake(){
 }
 function releaseLock(){ try{ if(S.wakeLock){ S.wakeLock.release(); S.wakeLock = null; } }catch(e){} }
 
-/* ===================== 운동 진행 ===================== */
+/* ===================== 운동 진행 =====================
+   난이도 하나를 「덩어리(block)」의 줄로 펴서 순서대로 돈다.
+   스쿼트 코스는 덩어리가 전부 스쿼트라 예전과 똑같이 보인다. */
+function buildPlan(lv){
+  const plan = [];
+  for(const m of lv.moves){
+    for(let i = 1; i <= m.sets; i++){
+      plan.push({ex:m.ex, kind:EX[m.ex].kind, reps:m.reps||0, secs:m.secs||0,
+                 down:m.down||0, hold:m.hold||0, up:m.up||0, i:i, n:m.sets, rest:lv.rest});
+    }
+  }
+  return plan;
+}
+function blkLabel(b){
+  return (S.course === 'squat') ? (b.i + '세트')
+       : (EX[b.ex].name + ' ' + b.i + '/' + b.n);
+}
+function blkSay(b){
+  return (S.course === 'squat') ? (b.i + '세트') : moveLabel(b);
+}
+
 function startWorkout(){
   audioOn(); pickVoice(); keepAwake();
-  const v = LV[S.level];
-  S.set = 1; S.rep = 0; S.totalReps = 0; S.elapsed = 0;
-  S.paused = false; S.quitArmed = 0; S.tipIdx = Math.floor(Math.random()*TIPS.length);
-  el('wSets').textContent = v.sets;
+  const v = LEV();
+  S.plan = buildPlan(v);
+  S.bi = 0; S.rep = 0; S.totalReps = 0; S.plankSec = 0; S.elapsed = 0;
+  S.paused = false; S.quitArmed = 0; S.tipIdx = 0;
   el('wLevel').textContent = v.emoji + ' ' + v.name;
   el('veil').hidden = true;
   el('btnPause').textContent = '⏸ 잠깐 멈춤';
   el('btnQuit').textContent = '그만';
   show('workout');
-  beginSet(true);
+  beginBlock(true);
 }
-function beginSet(first){
-  const v = LV[S.level];
+function beginBlock(first){
+  const b = BLK();
   S.rep = 0;
   show('workout');                       // 휴식에서 돌아올 때 반드시 필요
-  el('wSet').textContent = S.set;
+  el('wSetLab').textContent = blkLabel(b);
+  el('fig').setAttribute('viewBox', FIG[b.ex].vb);
   el('stage').classList.add('ready');
+  el('stage').classList.toggle('staying', b.kind === 'hold');
   setPhase('ready', 3100);
   S.lastShown = -1;
-  nextTip();
-  say(first ? '첫 번째 세트 시작합니다. 준비하세요' : S.set + '세트 시작합니다');
+  S.tipIdx = Math.floor(Math.random() * EX[b.ex].tips.length);
+  showTip();
+  say((first ? '준비하세요. ' : '') + blkSay(b) + ' 시작합니다');
   renderWorkout();
 }
 function setPhase(p, dur){
-  const v = LV[S.level];
+  const b = BLK();
   S.phase = p;
   S.phaseDur = (dur != null) ? dur :
-    (p==='down' ? v.down : p==='hold' ? v.hold : p==='up' ? v.up : 0);
+    (p==='down' ? b.down : p==='hold' ? b.hold : p==='up' ? b.up : p==='stay' ? b.secs*1000 : 0);
   S.phaseLeft = S.phaseDur;
   if(p==='down'){ sndDown(); }
   if(p==='up'){ sndUp(); }
 }
-function nextTip(){
-  S.tipIdx = (S.tipIdx + 1) % TIPS.length;
-  el('wTip').innerHTML = '<b>' + TIPS[S.tipIdx] + '</b>';
+function showTip(){
+  const t = EX[BLK().ex].tips;
+  el('wTip').innerHTML = '<b>' + t[S.tipIdx % t.length] + '</b>';
 }
-function endSet(){
-  const v = LV[S.level];
+function nextTip(){ S.tipIdx++; showTip(); }
+
+function endBlock(){
+  const b = BLK();
+  if(b.kind === 'hold') S.plankSec += b.secs;
   sndSetEnd(); buzz([0,70,60,70]);
-  if(S.set >= v.sets){ finish(); return; }
-  const done = S.set;
-  S.set++;
-  el('rSetDone').textContent = done;
-  el('rNext').innerHTML = '다음은 <b style="color:#eaf0f8">' + S.set + '세트 · ' + v.reps + '회</b>입니다.';
-  el('rTip').textContent = RESTTIPS[Math.floor(Math.random()*RESTTIPS.length)];
-  S.phase = 'rest'; S.phaseDur = v.rest*1000; S.phaseLeft = S.phaseDur;
+  if(S.bi + 1 >= S.plan.length){ finish(); return; }
+  const doneLab = blkLabel(b);
+  S.bi++;
+  const nx = BLK();
+  el('rDoneLab').textContent = doneLab + ' 완료';
+  el('rNext').innerHTML = '다음은 <b style="color:#eaf0f8">' + blkSay(nx) + '</b>입니다.';
+  const rt = CO().resttips;
+  el('rTip').textContent = rt[Math.floor(Math.random()*rt.length)];
+  S.phase = 'rest'; S.phaseDur = b.rest*1000; S.phaseLeft = S.phaseDur;
   S.lastShown = -1;
   show('rest');
-  setTimeout(() => say(done + '세트 완료. ' + v.rest + '초 쉬세요'), 650);
+  setTimeout(() => say(doneLab + ' 완료. ' + b.rest + '초 쉬세요'), 650);
   renderRest();
 }
 function skipRest(){ if(S.screen==='rest'){ S.phaseLeft = 0; } }
+
 function finish(){
   releaseLock();
-  const v = LV[S.level];
   const secs = Math.round(S.elapsed/1000);
+  const core = (S.course === 'core');
   const list = loadLog();
-  list.push({date: todayKey(), reps: S.totalReps, seconds: secs, level: S.level, sets: v.sets});
+  list.push({date: todayKey(), course: S.course, reps: S.totalReps, plankSec: S.plankSec,
+             seconds: secs, level: S.level, sets: S.plan.length});
   saveLog(list);
 
-  el('dReps').textContent = S.totalReps;
-  el('dTime').textContent = fmt(secs*1000);
-  el('dSets').textContent = v.sets;
-  el('dMsg').textContent = PRAISE[Math.floor(Math.random()*PRAISE.length)];
+  const put = (i, v, lab) => { el('dV'+i).textContent = v; el('dL'+i).textContent = lab; };
+  if(core){
+    put(1, S.plankSec + '초', '플랭크');
+    put(2, S.totalReps + '회', '데드버그');
+    put(3, fmt(secs*1000), '걸린 시간');
+  }else{
+    put(1, S.totalReps, '한 횟수');
+    put(2, fmt(secs*1000), '걸린 시간');
+    put(3, S.plan.length, '세트');
+  }
+  const pr = CO().praise;
+  el('dMsg').textContent = pr[Math.floor(Math.random()*pr.length)];
   el('dEmoji').textContent = ['🎉','👏','🔥','💪','✨'][Math.floor(Math.random()*5)];
 
   const tk = todayKey();
-  let today = 0; for(const r of list) if(r.date===tk) today += r.reps;
+  let today = 0, todaySec = 0;
+  for(const r of list) if(r.date===tk && isCore(r)===core){ today += (r.reps||0); todaySec += (r.plankSec||0); }
   const st = streakDays(list);
-  el('dLog').innerHTML = '오늘 누적 <b style="color:#eaf0f8">' + today + '회</b>' +
-    (st > 1 ? ' · <b style="color:#4ade80">' + st + '일 연속</b>' : '');
+  const sum = core ? ('오늘 누적 플랭크 <b style="color:#eaf0f8">' + todaySec + '초</b> · 데드버그 <b style="color:#eaf0f8">' + today + '회</b>')
+                   : ('오늘 누적 <b style="color:#eaf0f8">' + today + '회</b>');
+  el('dLog').innerHTML = sum + (st > 1 ? ' · <b style="color:#4ade80">' + st + '일 연속</b>' : '');
 
   sndFinish(); buzz([0,90,70,90,70,140]);
-  setTimeout(() => say('끝났습니다. 오늘 ' + S.totalReps + '개 했습니다. 수고했어요'), 700);
+  const spoken = core ? ('끝났습니다. 플랭크 ' + S.plankSec + '초, 데드버그 ' + S.totalReps + '개 했습니다. 수고했어요')
+                      : ('끝났습니다. 오늘 ' + S.totalReps + '개 했습니다. 수고했어요');
+  setTimeout(() => say(spoken), 700);
   show('done');
 }
 
@@ -651,14 +849,13 @@ function phaseT(){
   if(S.phase === 'down') return ease(p);
   if(S.phase === 'hold') return 1;
   if(S.phase === 'up')   return 1 - ease(p);
-  return 0;
+  return 0;                                    // ready · stay 는 시작 자세 그대로
 }
 function renderWorkout(){
-  const v = LV[S.level];
-  const t = phaseT();
+  const b = BLK();
   const color = S.phase === 'down' ? '#60a5fa' : S.phase === 'up' ? '#4ade80'
-              : S.phase === 'hold' ? '#c4b5fd' : '#8a98ad';
-  el('fig').innerHTML = figureSVG(t, color);
+              : (S.phase === 'hold' || S.phase === 'stay') ? '#c4b5fd' : '#8a98ad';
+  el('fig').innerHTML = figureSVG(b.ex, phaseT(), color);
 
   const cue = el('wCue');
   cue.className = 'cue ' + (S.phase === 'ready' ? '' : S.phase);
@@ -666,13 +863,27 @@ function renderWorkout(){
     const n = Math.ceil(S.phaseLeft/1000);
     cue.textContent = '준비하세요';
     el('wBig').innerHTML = (n > 0 ? n : '시작') + '';
+    el('wBar').style.width = '0%';
     if(n !== S.lastShown && n > 0 && n <= 3){ S.lastShown = n; sndTick(); say(String(n)); }
+  }else if(b.kind === 'hold'){
+    el('stage').classList.remove('ready');
+    cue.textContent = EX[b.ex].cue(S.phase, S.rep);
+    const left = Math.ceil(S.phaseLeft/1000);
+    el('wBig').innerHTML = (left > 0 ? left : 0) + '<small> 초</small>';
+    el('wBar').style.width = Math.round((1 - S.phaseLeft/S.phaseDur) * 100) + '%';
+    if(left !== S.lastShown){
+      const prev = S.lastShown;
+      S.lastShown = left;
+      if(left <= 5 && left > 0){ sndTick(); buzz(15); }
+      if(left === 10 && b.secs > 14) say('10초 남았습니다');
+      if(prev > 0 && (b.secs - left) > 0 && (b.secs - left) % 10 === 0) nextTip();
+    }
   }else{
     el('stage').classList.remove('ready');
-    cue.textContent = S.phase === 'down' ? '천천히 앉기' : S.phase === 'up' ? '밀고 올라오기' : '잠깐 멈춤';
-    el('wBig').innerHTML = S.rep + '<small> / ' + v.reps + '</small>';
+    cue.textContent = EX[b.ex].cue(S.phase, S.rep);
+    el('wBig').innerHTML = S.rep + '<small> / ' + b.reps + '</small>';
+    el('wBar').style.width = Math.round(S.rep / b.reps * 100) + '%';
   }
-  el('wBar').style.width = Math.round(S.rep / v.reps * 100) + '%';
   el('wClock').textContent = fmt(S.elapsed);
 }
 function ringSVG(frac, left){
@@ -709,15 +920,17 @@ function tick(now){
 
   if(S.screen === 'rest'){
     renderRest();
-    if(S.phaseLeft <= 0) beginSet(false);
+    if(S.phaseLeft <= 0) beginBlock(false);
     return;
   }
 
-  const v = LV[S.level];
+  const b = BLK();
   if(S.phase === 'ready'){
-    if(S.phaseLeft <= 0){ say('시작'); setPhase('down'); }
+    if(S.phaseLeft <= 0){ say('시작'); setPhase(b.kind === 'hold' ? 'stay' : 'down'); S.lastShown = -1; }
+  }else if(S.phase === 'stay'){
+    if(S.phaseLeft <= 0){ endBlock(); return; }
   }else if(S.phase === 'down'){
-    if(S.phaseLeft <= 0) setPhase(v.hold > 0 ? 'hold' : 'up');
+    if(S.phaseLeft <= 0) setPhase(b.hold > 0 ? 'hold' : 'up');
   }else if(S.phase === 'hold'){
     if(S.phaseLeft <= 0) setPhase('up');
   }else if(S.phase === 'up'){
@@ -726,7 +939,7 @@ function tick(now){
       sndCount(); buzz(25);
       say(KNUM[S.rep-1] || String(S.rep));
       if(S.rep % 5 === 0) nextTip();
-      if(S.rep >= v.reps){ endSet(); return; }
+      if(S.rep >= b.reps){ endBlock(); return; }
       setPhase('down');
     }
   }
@@ -742,9 +955,7 @@ if('speechSynthesis' in window){
   pickVoice();
 }
 loadCfg();
-renderLevels();
-renderStats();
-drawStaticFigures();
+renderHome();
 requestAnimationFrame(tick);
 </script>
 </body>

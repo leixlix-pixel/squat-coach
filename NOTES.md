@@ -46,13 +46,56 @@ MediaPipe 로 무릎 각도를 재서 자동 카운트하는 길도 있었지만
 - **기록을 서버로 보내지 말 것.** 서버가 없다는 것이 이 앱의 약속이다(README 에 적어 두었다).
   친구들끼리 순위를 보고 싶다는 말이 나와도, 그건 별개 저장소에서 따로 만들 것.
 
+## 코어 코스 — 플랭크·데드버그 (2026-09-20)
+
+스쿼트는 허벅지·엉덩이 운동이고 복근은 버티는 역할만 한다. 그래서 복근을 따로 하려고
+**별도 코스**로 붙였다. 홈 맨 위에서 `스쿼트` / `코어` 를 고른다.
+
+**세트 사이 휴식에 끼워 넣지 않았다**(2026-09-20 엘리 선택). 휴식 40~60초는 다음 세트를
+할 수 있게 하는 최소치라, 거기에 플랭크를 넣으면 쉬는 게 아니라 운동이 된다.
+
+**행잉 레그레이즈는 뺐다.** 철봉이 있어야 하고, 매달리는 악력부터 안 되는 사람이 많고,
+반동을 쓰면 허리를 다친다. 쓰는 사람이 운동을 안 하던 사람들이라는 전제에 안 맞는다.
+
+### 하지 말 것 (코어)
+
+- **덩어리(block) 줄을 세트 수로 되돌리지 말 것.** 코어는 한 판 안에 **동작이 둘**이라
+  `S.set` 하나로는 「플랭크 2세트 뒤 데드버그 2세트」를 표현할 수 없다. 지금은
+  `buildPlan()` 이 난이도를 덩어리 줄(`S.plan`)로 펴고 `S.bi` 가 그 줄을 훑는다.
+  스쿼트 코스는 덩어리가 전부 스쿼트라 화면에 예전과 똑같이 보인다.
+- **버티기 단계 이름을 `hold` 로 합치지 말 것.** `hold` 는 스쿼트가 맨 아래에서 잠깐
+  멈추는 0.3~0.4초짜리다. 플랭크의 버티기는 `stay` 다. 합치면 스쿼트가 맨 아래에서
+  30초를 버틴다.
+- **플랭크 초를 `reps` 에 같이 더하지 말 것.** 기록(`plankSec`)과 홈 통계가
+  「20초 = 20회」가 되어 숫자가 거짓말을 한다.
+- **옛 기록에는 `course` 가 없다.** `isCore(r)` 로 판정한다 — `r.course === 'core'` 가
+  아니면 전부 스쿼트다. `r.course === 'squat'` 로 뒤집어 쓰지 말 것(2026-09-12 이후
+  기록이 통째로 사라진다).
+- **연속 일수는 코스를 가리지 않는다.** 코어만 한 날도 연속이 끊기지 않아야 한다.
+- **안내 화면의 그림을 id 로 뒤에서 찾지 말 것.** `renderGuide()` 가 `innerHTML` 로
+  통째로 갈아 끼우므로 **그려 넣은 채로** 넣는다(`figTag()`). 예전 `drawStaticFigures()`
+  처럼 나중에 `el('figStand')` 을 찾으면 코스를 바꾸는 순간 `null` 로 죽는다.
+  (위의 「innerHTML 로 덮는 요소 안쪽에 id 를 달지 말 것」과 같은 사고다.)
+- **누운 그림의 viewBox 를 세로로 되돌리지 말 것.** 플랭크·데드버그는 가로로 길어서
+  `0 0 200 120` 이다. `beginBlock()` 이 `#fig` 의 viewBox 를 동작마다 갈아 끼운다.
+- **강도를 올리지 말 것.** 플랭크 상한 45초, 데드버그 상한 16회다. 데드버그는
+  **한 번 뻗는 것이 1회**라 16회 = 좌우 8번씩이다.
+- **의학적 조언을 넣지 말 것.** 코어 쪽 안내도 「아프면 멈춰라 · 무릎 대고 해라 ·
+  덜 뻗어도 된다」 세 가지뿐이고 그 선을 넘지 않는다.
+
 ## 구조 한눈에
 
 - 화면 다섯: `home` · `guide` · `workout` · `rest` · `done`. `show(name)` 하나로 갈아 끼운다.
+- 코스 둘: `COURSE.squat` · `COURSE.core`. 난이도 하나가 `moves` 를 갖고, `buildPlan()` 이
+  그것을 덩어리 줄(`S.plan`)로 편다. 덩어리 하나 = 한 세트. `S.bi` 가 지금 몇 번째인지다.
+- 동작 셋: `EX.squat` · `EX.plank` · `EX.deadbug`. `kind` 가 `rep`(왕복 · 횟수를 센다)인지
+  `hold`(버티기 · 초를 센다)인지로 갈린다.
 - 시간은 `tick(now)` 하나(`requestAnimationFrame`)가 민다. `S.phaseLeft` 를 깎아
   `ready → down → hold → up` 을 돌리고, `up` 이 끝나는 순간에만 횟수를 센다.
-- 사람 그림은 선 다섯 개 + 원 하나짜리 SVG. 서 있는 자세(`POSE_UP`)와 앉은 자세(`POSE_DOWN`)의
-  관절 좌표를 `t`(0~1)로 보간해서 그린다. `t` 는 현재 단계의 진행률에 `easeInOutQuad` 를 먹인 값.
+  버티기는 `ready → stay` 뿐이고, `stay` 가 끝나면 그 덩어리가 끝난다.
+- 사람 그림은 선 몇 개 + 원 하나짜리 SVG. `FIG[동작]` 이 관절 좌표 두 벌(`a`=시작,
+  `b`=끝)과 이을 뼈 목록(`bones`)을 갖는다. `b` 가 없으면 고정 자세다(플랭크).
+  두 자세를 `t`(0~1)로 보간해서 그리고, `t` 는 현재 단계의 진행률에 `easeInOutQuad` 를 먹인 값.
   좌표를 손볼 때는 **팔·다리 길이가 두 자세에서 거의 같아야** 한다(보간 중에 늘었다 줄면 어색하다).
 - 소리는 Web Audio 오실레이터 하나로 만든다. 음원 파일이 없다.
 
@@ -62,10 +105,28 @@ MediaPipe 로 무릎 각도를 재서 자동 카운트하는 길도 있었지만
 시간을 손으로 밀어서 한 세션을 통째로 돌려 볼 것:
 
 ```js
-LV.test={key:'test',emoji:'T',name:'테스트',reps:3,sets:2,rest:2,down:120,hold:40,up:120,ds:'t'};
-S.level='test'; cfg.voice=false; cfg.beep=false; startWorkout();
+COURSE.squat.levels.test={emoji:'T',name:'테스트',ds:'t',rest:2,
+  moves:[{ex:'squat',reps:3,sets:2,down:120,hold:40,up:120}]};
+S.course='squat'; S.level='test'; cfg.voice=false; cfg.beep=false; startWorkout();
 let t=performance.now(); for(let i=0;i<400;i++){ t+=50; tick(t); }
 JSON.stringify({screen:S.screen, total:S.totalReps});   // → {"screen":"done","total":6}
 ```
 
-`done` 에 총 6회로 도착하면 흐름이 성한 것이다.
+`done` 에 총 6회로 도착하면 흐름이 성한 것이다. 코어는 동작이 둘이라 따로 본다:
+
+```js
+COURSE.core.levels.test={emoji:'T',name:'테스트',ds:'t',rest:2,
+  moves:[{ex:'plank',secs:3,sets:2},{ex:'deadbug',reps:2,sets:1,down:120,hold:40,up:120}]};
+S.course='core'; S.level='test'; cfg.voice=false; cfg.beep=false; startWorkout();
+for(let i=0;i<600;i++){ t+=50; tick(t); }
+JSON.stringify({screen:S.screen, plank:S.plankSec, reps:S.totalReps});
+// → {"screen":"done","plank":6,"reps":2}
+```
+
+**`t` 를 되감지 말 것** — 두 판을 잇달아 돌릴 때 시계를 1000 부터 다시 시작하면
+`tick()` 의 `last` 가 전역이라 `dt` 가 음수로 나오고 `phaseLeft` 가 되레 늘어난다.
+브라우저에선 안 나는 일이고(rAF 시각은 단조 증가한다) **검증할 때만 걸리는 함정**이다.
+
+브라우저를 안 띄우고 보려면 노드로 돌려도 된다 — DOM 을 흉내 낸 30줄짜리에
+`<script>` 를 통째로 넣고 위와 같이 `tick()` 을 손으로 미는 방식이다. 2026-09-20 에
+코어를 붙이면서 그렇게 검증했다(덩어리 줄 · 기록 · 뼈 길이 · viewBox 벗어남까지).
