@@ -77,6 +77,9 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
 .pk .pn small{display:block; font-size:11.5px; font-weight:500; color:#6f7d92}
 .pk.on{border-color:var(--go); background:#16271d; color:var(--ink)}
 .pk.on .ck{background:var(--go-d); border-color:var(--go)}
+.warmrow{margin-top:12px}
+.warmrow .pk{width:100%}
+.figbox.grid{flex-wrap:wrap; gap:10px}
 .levels{display:flex; flex-direction:column; gap:10px; margin-top:12px}
 .lv{
   background:var(--card); border:2px solid var(--line); border-radius:16px;
@@ -200,6 +203,7 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
   <div class="sub" id="homeSub"></div>
 
   <div class="courses" id="courses"></div>
+  <div class="warmrow" id="warmrow"></div>
   <div class="picks" id="picks" hidden></div>
   <div class="levels" id="levels"></div>
 
@@ -362,8 +366,33 @@ const EX = {
     cue(phase){ return phase==='down' ? '천천히 내려가기' : phase==='up' ? '밀고 올라오기' : '잠깐 멈춤'; },
     tips:['힘들면 무릎을 대고 하세요','머리부터 발까지 한 줄','팔꿈치는 몸 쪽으로',
           '엉덩이가 처지지 않게','올라올 때 내쉬기','가슴이 먼저 내려가게']
+  },
+  /* ---- 준비 스트레칭 — kind:'flow' 는 초를 재지만 플랭크 초에도 횟수에도 안 더한다.
+          period 가 있으면 그림이 그 주기로 오가고, 없으면 늘린 자세로 들어가 머문다 ---- */
+  march: {
+    name:'제자리 걷기', short:'걷기', kind:'flow', period:1400,
+    cue(){ return '무릎 들며 걷기'; },
+    tips:['무릎을 배꼽 높이까지','팔도 같이 흔들기','숨을 편하게 쉬면서','몸을 데우는 시간입니다']
+  },
+  legswing: {
+    name:'다리 앞뒤로 흔들기', short:'다리 흔들기', kind:'flow', side:true, period:1800,
+    cue(){ return '앞뒤로 흔들기'; },
+    tips:['벽이나 의자를 한 손으로 짚고','힘을 빼고 시계추처럼','점점 크게, 무리하지 않게','상체는 곧게 세운 채로']
+  },
+  calf: {
+    name:'종아리 늘리기', short:'종아리', kind:'flow', side:true,
+    cue(){ return '벽 밀며 늘리기'; },
+    tips:['뒷발 뒤꿈치를 바닥에 붙이고','뒷다리 무릎은 곧게','반동 없이 그대로 머물기','숨을 길게 내쉬기']
+  },
+  quad: {
+    name:'허벅지 앞 늘리기', short:'허벅지', kind:'flow', side:true,
+    cue(){ return '발목 잡고 늘리기'; },
+    tips:['한 손은 벽을 짚고','무릎끼리 나란히','허리를 젖히지 않기','발목이 안 잡히면 바지를 잡아도 됩니다']
   }
 };
+/* 모든 코스 앞에 붙는 준비 스트레칭(홈에서 끌 수 있다). 동작 사이 휴식이 없고 3초 준비만 있다 */
+const WARM = [{ex:'march',secs:30},{ex:'legswing',secs:15},{ex:'calf',secs:20},{ex:'quad',secs:20}];
+const WARM_REST = 15;           // 스트레칭이 끝나고 본 운동 앞에 한 번만
 /* 덤벨 코스에서 고를 수 있는 동작 — 이 순서대로 돈다(누른 순서가 아니다) */
 const DB_PICK = ['goblet','rdl','split','row','pushup'];
 const SIDE_REST = 15;           // 한쪽씩 하는 동작에서 왼쪽 → 오른쪽 넘어갈 때만. 세트 사이 휴식이 아니다
@@ -454,7 +483,7 @@ const S = {
   elapsed:0, paused:false, quitArmed:0,
   lastShown:-1, tipIdx:0, wakeLock:null
 };
-const cfg = {voice:true, beep:true, vib:true, course:'squat', dbPick:DB_PICK.slice()};
+const cfg = {voice:true, beep:true, vib:true, warm:true, course:'squat', dbPick:DB_PICK.slice()};
 
 const el = id => document.getElementById(id);
 const LS_CFG = 'squat-coach-cfg', LS_LOG = 'squat-coach-log';
@@ -641,6 +670,47 @@ const FIG = {
     a:{head:[32,45],neck:[45,50],shoulder:[56,54],elbow:[56,78],hand:[56,102],hip:[116,75],knee:[150,87],ankle:[176,96],toe:[186,101]},
     b:{head:[24,82],neck:[38,83],shoulder:[50,84],elbow:[74,86],hand:[56,102],hip:[114,90],knee:[150,93],ankle:[176,96],toe:[186,101]},
     bones:[['hand','elbow',6],['elbow','shoulder',7],['neck','hip',8],['hip','knee',8],['knee','ankle',8],['ankle','toe',6]]
+  },
+  /* ---- 준비 스트레칭. m* = 움직이는 다리, 나머지 다리는 디딘 다리 ---- */
+  march: {
+    vb:'0 0 120 200', floor:'M8 184 H112', headR:11.5,
+    a:{head:[60,28],neck:[60,40],shoulder:[60,52],hand:[67,92],hip:[60,100],knee:[60,140],ankle:[60,178],toe:[82,179],
+       mknee:[62,140],mankle:[62,178],mtoe:[84,179]},
+    b:{head:[60,28],neck:[60,40],shoulder:[60,52],hand:[44,88],hip:[60,100],knee:[60,140],ankle:[60,178],toe:[82,179],
+       mknee:[98,110],mankle:[95,148],mtoe:[115,152]},
+    bones:[['neck','hip',8],['hip','knee',8],['knee','ankle',8],['ankle','toe',6],
+           ['hip','mknee',8],['mknee','mankle',8],['mankle','mtoe',6],['shoulder','hand',6]]
+  },
+  legswing: {
+    vb:'0 0 130 200', floor:'M6 184 H124', headR:11.5,
+    a:{head:[50,28],neck:[50,40],shoulder:[50,52],hand:[57,92],hip:[50,100],knee:[50,140],ankle:[50,178],toe:[72,179],
+       mknee:[38,138],mankle:[26,174],mtoe:[46,178]},
+    b:{head:[50,28],neck:[50,40],shoulder:[50,52],hand:[57,92],hip:[50,100],knee:[50,140],ankle:[50,178],toe:[72,179],
+       mknee:[80,126],mankle:[108,150],mtoe:[120,134]},
+    bones:[['neck','hip',8],['hip','knee',8],['knee','ankle',8],['ankle','toe',6],
+           ['hip','mknee',8],['mknee','mankle',8],['mankle','mtoe',6],['shoulder','hand',6]]
+  },
+  /* 벽을 짚고 뒷다리를 곧게 — 앞으로 기대면서 뒷종아리가 늘어난다 */
+  calf: {
+    vb:'0 0 130 200', floor:'M6 184 H124', headR:11.5,
+    prop:'M120 24 V184',
+    a:{head:[62,32],neck:[61,44],shoulder:[60,56],elbow:[78,68],hand:[96,62],hip:[56,104],
+       fknee:[78,138],fankle:[86,178],ftoe:[106,179],bknee:[40,141],bankle:[24,178],btoe:[44,179]},
+    b:{head:[101,48],neck:[95,58],shoulder:[88,68],elbow:[100,82],hand:[116,72],hip:[62,108],
+       fknee:[86,140],fankle:[86,178],ftoe:[106,179],bknee:[43,143],bankle:[24,178],btoe:[44,179]},
+    bones:[['neck','hip',8],['hip','bknee',8],['bknee','bankle',8],['bankle','btoe',6],
+           ['hip','fknee',8],['fknee','fankle',8],['fankle','ftoe',6],['shoulder','elbow',6],['elbow','hand',6]]
+  },
+  /* 한 손은 벽, 다른 손으로 뒤로 접은 발목을 잡는다 */
+  quad: {
+    vb:'0 0 120 200', floor:'M8 184 H112', headR:11.5,
+    prop:'M100 24 V184',
+    a:{head:[56,28],neck:[56,40],shoulder:[56,52],whand:[94,62],elbow:[54,74],hand:[52,94],hip:[56,100],
+       knee:[56,140],ankle:[56,178],toe:[78,179],mknee:[58,140],mankle:[58,177]},
+    b:{head:[56,28],neck:[56,40],shoulder:[56,52],whand:[94,62],elbow:[46,74],hand:[42,96],hip:[56,100],
+       knee:[56,140],ankle:[56,178],toe:[78,179],mknee:[52,138],mankle:[42,98]},
+    bones:[['neck','hip',8],['hip','knee',8],['knee','ankle',8],['ankle','toe',6],
+           ['hip','mknee',8],['mknee','mankle',8],['shoulder','whand',6],['shoulder','elbow',6],['elbow','hand',6]]
   }
 };
 function figureSVG(key, t, color){
@@ -782,12 +852,33 @@ const GUIDE = {
     }]
   }
 };
+/* 준비 스트레칭 — 켜 두면 어느 코스든 안내 맨 위에 붙는다 */
+const GUIDE_WARM = {
+  h:'먼저 준비 스트레칭 — 약 3분',
+  figs:[['march','① 제자리 걷기 30초','#4ade80'],['legswing','② 다리 흔들기 좌우 15초','#4ade80'],
+        ['calf','③ 종아리 좌우 20초','#4ade80'],['quad','④ 허벅지 앞 좌우 20초','#4ade80']],
+  steps:['<b>제자리 걷기</b> — 무릎을 배꼽 높이까지 들며 팔도 같이 흔듭니다.',
+         '<b>다리 흔들기</b> — 벽이나 의자를 한 손으로 짚고, 힘을 뺀 다리를 <b>시계추처럼</b> 앞뒤로.',
+         '<b>종아리</b> — 벽을 짚고 한 발을 뒤로. 뒷무릎은 곧게, <b>뒤꿈치는 바닥에</b> 붙인 채 앞으로 기댑니다.',
+         '<b>허벅지 앞</b> — 한 손으로 벽을 짚고, 다른 손으로 <b>뒤로 접은 발목</b>을 잡아 당깁니다.'],
+  note:'늘릴 때는 <b>반동 없이</b>, 당기는 느낌까지만. 왼쪽·오른쪽은 3초 준비 뒤 저절로 넘어갑니다.'
+};
 /* 그림을 id 로 뒤에서 찾지 않는다 — innerHTML 안에 이미 그려서 넣는다 */
 function renderGuide(){
   const g = GUIDE[S.course];
   el('guideTitle').textContent = g.title;
   const parts = (S.course === 'dumbbell') ? g.parts.filter(p => dbPicks().includes(p.ex)) : g.parts;
-  let h = g.note ? '<div class="safety" style="margin:0 0 4px">' + g.note + '</div>' : '';
+  let h = '';
+  if(cfg.warm){
+    const w = GUIDE_WARM;
+    h += '<div class="gh">' + w.h + '</div>';
+    h += '<div class="figbox grid">' + w.figs.map(f => figTag(f[0], 1, f[2], f[1])).join('') + '</div>';
+    h += '<div class="steps">' + w.steps.map((s,i) =>
+         '<div class="step"><i>'+(i+1)+'</i><div>'+s+'</div></div>').join('') + '</div>';
+    h += '<div class="safety" style="margin-top:10px">' + w.note + '</div>';
+    h += '<div class="gh">그다음 ' + CO().name + '</div>';
+  }
+  h += g.note ? '<div class="safety" style="margin:0 0 4px">' + g.note + '</div>' : '';
   for(const p of parts){
     if(p.h) h += '<div class="gh">' + p.h + '</div>';
     h += '<div class="figbox' + (p.col ? ' col' : '') + '">' +
@@ -819,8 +910,15 @@ function goGuide(){ stopAll(); renderGuide(); show('guide'); }
 function renderHome(){
   el('homeSub').innerHTML = CO().sub;
   el('homeSafety').innerHTML = CO().safety;
-  renderCourses(); renderPicks(); renderLevels(); renderStats();
+  renderCourses(); renderWarm(); renderPicks(); renderLevels(); renderStats();
 }
+function renderWarm(){
+  const on = !!cfg.warm;
+  el('warmrow').innerHTML = '<button class="pk '+(on?'on':'')+'" onclick="toggleWarm()">' +
+    '<span class="ck">'+(on?'✓':'')+'</span><span class="pn">🤸 준비 스트레칭 먼저' +
+    '<small>걷기 · 다리 흔들기 · 종아리 · 허벅지 — 약 3분</small></span></button>';
+}
+function toggleWarm(){ cfg.warm = !cfg.warm; saveCfg(); renderWarm(); buzz(15); }
 function renderPicks(){
   const box = el('picks');
   box.hidden = (S.course !== 'dumbbell');
@@ -934,12 +1032,27 @@ function buildPlan(lv){
   }
   return plan;
 }
+/* 준비 스트레칭 덩어리 — 사이 휴식 0(3초 준비만), 마지막에만 WARM_REST */
+function warmPlan(){
+  const plan = [];
+  for(const m of WARM){
+    const sides = EX[m.ex].side ? ['왼쪽','오른쪽'] : [''];
+    for(const sd of sides)
+      plan.push({ex:m.ex, kind:'flow', reps:0, secs:m.secs, down:0, hold:0, up:0, i:1, n:1, side:sd,
+                 rest:0, swap:'', warm:true});
+  }
+  const last = plan[plan.length-1];
+  last.rest = WARM_REST; last.swap = '스트레칭 끝. 이제 본 운동입니다 — 물 한 모금 드세요.';
+  return plan;
+}
 function blkLabel(b){
+  if(b.warm) return '스트레칭 · ' + EX[b.ex].short + (b.side ? ' ' + b.side : '');
   if(S.course === 'squat') return b.i + '세트';
   if(S.course === 'dumbbell') return EX[b.ex].short + (b.side ? ' ' + b.side : '') + ' ' + b.i + '/' + b.n;
   return EX[b.ex].name + ' ' + b.i + '/' + b.n;
 }
 function blkSay(b){
+  if(b.warm) return EX[b.ex].name + (b.side ? ' ' + b.side : '');
   if(S.course === 'squat') return b.i + '세트';
   if(S.course === 'dumbbell') return EX[b.ex].name + (b.side ? ' ' + b.side : '') + ' ' + b.reps + '회';
   return moveLabel(b);
@@ -948,7 +1061,7 @@ function blkSay(b){
 function startWorkout(){
   audioOn(); pickVoice(); keepAwake();
   const v = LEV();
-  S.plan = buildPlan(v);
+  S.plan = (cfg.warm ? warmPlan() : []).concat(buildPlan(v));
   S.bi = 0; S.rep = 0; S.totalReps = 0; S.plankSec = 0; S.elapsed = 0;
   S.paused = false; S.quitArmed = 0; S.tipIdx = 0;
   el('wLevel').textContent = v.emoji + ' ' + v.name;
@@ -965,7 +1078,7 @@ function beginBlock(first){
   el('wSetLab').textContent = blkLabel(b);
   el('fig').setAttribute('viewBox', FIG[b.ex].vb);
   el('stage').classList.add('ready');
-  el('stage').classList.toggle('staying', b.kind === 'hold');
+  el('stage').classList.toggle('staying', b.kind !== 'rep');
   setPhase('ready', 3100);
   S.lastShown = -1;
   S.tipIdx = Math.floor(Math.random() * EX[b.ex].tips.length);
@@ -995,6 +1108,7 @@ function endBlock(){
   if(S.bi + 1 >= S.plan.length){ finish(); return; }
   const doneLab = blkLabel(b);
   S.bi++;
+  if(!b.rest){ beginBlock(false); return; }      // 스트레칭 동작 사이 — 휴식 화면 없이 3초 준비로
   const nx = BLK();
   el('rDoneLab').textContent = doneLab + ' 완료';
   el('rNext').innerHTML = '다음은 <b style="color:#eaf0f8">' + blkSay(nx) + '</b>입니다.';
@@ -1003,7 +1117,8 @@ function endBlock(){
   S.phase = 'rest'; S.phaseDur = b.rest*1000; S.phaseLeft = S.phaseDur;
   S.lastShown = -1;
   show('rest');
-  setTimeout(() => say(doneLab + ' 완료. ' + b.rest + '초 쉬세요'), 650);
+  setTimeout(() => say(b.warm ? ('스트레칭 끝. ' + b.rest + '초 뒤에 본 운동입니다')
+                              : (doneLab + ' 완료. ' + b.rest + '초 쉬세요')), 650);
   renderRest();
 }
 function skipRest(){ if(S.screen==='rest'){ S.phaseLeft = 0; } }
@@ -1013,9 +1128,10 @@ function finish(){
   const secs = Math.round(S.elapsed/1000);
   const core = (S.course === 'core');
   const list = loadLog();
-  const sets = S.plan.filter(b => b.side !== '오른쪽').length;     // 왼쪽·오른쪽은 한 세트
+  const sets = S.plan.filter(b => !b.warm && b.side !== '오른쪽').length;     // 왼쪽·오른쪽은 한 세트, 스트레칭은 안 센다
   const rec = {date: todayKey(), course: S.course, reps: S.totalReps, plankSec: S.plankSec,
                seconds: secs, level: S.level, sets: sets};
+  if(S.plan.some(b => b.warm)) rec.warm = true;
   if(S.course === 'dumbbell') rec.moves = dbPicks();
   list.push(rec);
   saveLog(list);
@@ -1082,7 +1198,13 @@ function phaseT(){
   if(S.phase === 'down') return ease(p);
   if(S.phase === 'hold') return 1;
   if(S.phase === 'up')   return 1 - ease(p);
-  return 0;                                    // ready · stay 는 시작 자세 그대로
+  if(S.phase === 'stay'){                      // 스트레칭: 주기대로 오가거나, 늘린 자세로 들어가 머문다
+    const e = EX[BLK().ex];
+    if(e.kind !== 'flow') return 0;            // 플랭크는 시작 자세 그대로
+    const ms = S.phaseDur - S.phaseLeft;
+    return e.period ? (1 - Math.cos(2*Math.PI*ms/e.period))/2 : ease(Math.min(1, ms/1500));
+  }
+  return 0;                                    // ready 는 시작 자세 그대로
 }
 function renderWorkout(){
   const b = BLK();
@@ -1098,7 +1220,7 @@ function renderWorkout(){
     el('wBig').innerHTML = (n > 0 ? n : '시작') + '';
     el('wBar').style.width = '0%';
     if(n !== S.lastShown && n > 0 && n <= 3){ S.lastShown = n; sndTick(); say(String(n)); }
-  }else if(b.kind === 'hold'){
+  }else if(b.kind !== 'rep'){
     el('stage').classList.remove('ready');
     cue.textContent = EX[b.ex].cue(S.phase, S.rep);
     const left = Math.ceil(S.phaseLeft/1000);
@@ -1159,7 +1281,7 @@ function tick(now){
 
   const b = BLK();
   if(S.phase === 'ready'){
-    if(S.phaseLeft <= 0){ say('시작'); setPhase(b.kind === 'hold' ? 'stay' : 'down'); S.lastShown = -1; }
+    if(S.phaseLeft <= 0){ say('시작'); setPhase(b.kind !== 'rep' ? 'stay' : 'down'); S.lastShown = -1; }
   }else if(S.phase === 'stay'){
     if(S.phaseLeft <= 0){ endBlock(); return; }
   }else if(S.phase === 'down'){
