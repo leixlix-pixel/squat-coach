@@ -101,6 +101,10 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
 .stat{flex:1; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 6px; text-align:center}
 .stat b{display:block; font-size:22px; font-weight:900; color:var(--go)}
 .stat span{font-size:12px; color:var(--muted)}
+.todaysum{margin-top:10px; background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:11px 14px; font-size:14px; color:var(--muted); line-height:1.6; text-align:center}
+.todaysum b{color:var(--go); font-size:20px; font-weight:900; margin:0 2px}
+.todaysum .br{display:block; font-size:12.5px}
 
 .toggles{display:flex; gap:8px; margin-top:16px}
 .tg{
@@ -212,6 +216,7 @@ button{font-family:inherit; color:inherit; border:none; background:none; cursor:
     <div class="stat"><b id="stV2">0</b><span id="stL2">이번 주</span></div>
     <div class="stat"><b id="stV3">0</b><span id="stL3">연속 일수</span></div>
   </div>
+  <div class="todaysum" id="todaySum"></div>
 
   <div class="toggles">
     <button class="tg" id="tgVoice" onclick="toggle('voice')"><span class="ic">🔊</span><span id="tgVoiceT">음성 안내</span></button>
@@ -554,6 +559,23 @@ function renderStats(){
     put(2, week, '이번 주');
   }
   put(3, streakDays(list), '연속 일수');      // 어느 코스든 한 날은 센다
+  el('todaySum').innerHTML = todaySumHTML(list);
+}
+/* 오늘 한 시간 합계 — 코스를 가리지 않는다. 「그만」으로 끝낸 판은 기록이 없어서 안 들어간다 */
+function minLabel(sec){ return sec < 60 ? sec + '초' : Math.round(sec/60) + '분'; }
+function todaySumHTML(list){
+  const tk = todayKey(), by = {};
+  let total = 0, warm = 0;
+  for(const r of list){
+    if(r.date !== tk) continue;
+    const s = r.seconds || 0;
+    total += s; warm += (r.warmSec || 0);
+    by[courseOf(r)] = (by[courseOf(r)] || 0) + s - (r.warmSec || 0);
+  }
+  if(!total) return '오늘은 아직 안 했습니다';
+  const br = Object.keys(COURSE).filter(k => by[k] > 0).map(k => COURSE[k].name + ' ' + minLabel(by[k]));
+  if(warm) br.unshift('스트레칭 ' + minLabel(warm));
+  return '오늘 운동 합계<b>' + minLabel(total) + '</b><span class="br">' + br.join(' · ') + '</span>';
 }
 
 /* ===================== 소리 ===================== */
@@ -1062,7 +1084,7 @@ function startWorkout(){
   audioOn(); pickVoice(); keepAwake();
   const v = LEV();
   S.plan = (cfg.warm ? warmPlan() : []).concat(buildPlan(v));
-  S.bi = 0; S.rep = 0; S.totalReps = 0; S.plankSec = 0; S.elapsed = 0;
+  S.bi = 0; S.rep = 0; S.totalReps = 0; S.plankSec = 0; S.elapsed = 0; S.warmMs = 0;
   S.paused = false; S.quitArmed = 0; S.tipIdx = 0;
   el('wLevel').textContent = v.emoji + ' ' + v.name;
   el('veil').hidden = true;
@@ -1131,7 +1153,7 @@ function finish(){
   const sets = S.plan.filter(b => !b.warm && b.side !== '오른쪽').length;     // 왼쪽·오른쪽은 한 세트, 스트레칭은 안 센다
   const rec = {date: todayKey(), course: S.course, reps: S.totalReps, plankSec: S.plankSec,
                seconds: secs, level: S.level, sets: sets};
-  if(S.plan.some(b => b.warm)) rec.warm = true;
+  if(S.plan.some(b => b.warm)){ rec.warm = true; rec.warmSec = Math.min(secs, Math.round(S.warmMs/1000)); }
   if(S.course === 'dumbbell') rec.moves = dbPicks();
   list.push(rec);
   saveLog(list);
@@ -1156,7 +1178,8 @@ function finish(){
   const st = streakDays(list);
   const sum = core ? ('오늘 누적 플랭크 <b style="color:#eaf0f8">' + todaySec + '초</b> · 데드버그 <b style="color:#eaf0f8">' + today + '회</b>')
                    : ('오늘 누적 <b style="color:#eaf0f8">' + today + '회</b>');
-  el('dLog').innerHTML = sum + (st > 1 ? ' · <b style="color:#4ade80">' + st + '일 연속</b>' : '');
+  el('dLog').innerHTML = sum + (st > 1 ? ' · <b style="color:#4ade80">' + st + '일 연속</b>' : '') +
+                         '<br>' + todaySumHTML(list).replace('<b>', ' <b style="color:#eaf0f8">').replace('class="br"', 'style="display:block"');
 
   sndFinish(); buzz([0,90,70,90,70,140]);
   const spoken = core ? ('끝났습니다. 플랭크 ' + S.plankSec + '초, 데드버그 ' + S.totalReps + '개 했습니다. 수고했어요')
@@ -1271,6 +1294,7 @@ function tick(now){
   if(S.paused) return;
 
   S.elapsed += dt;
+  if(S.screen === 'workout' && BLK().warm) S.warmMs += dt;    // 합계에서 스트레칭을 따로 보이려고
   S.phaseLeft -= dt;
 
   if(S.screen === 'rest'){
